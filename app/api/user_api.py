@@ -25,8 +25,8 @@ def signup(
     licenseFile: UploadFile = File(...),
         service:UserService=Depends(get_user_service)
 ):
-    res = service.signup(login_id,password,phone,name,hospital,birth,licenseFile)
-    return "signup"
+    service.signup(login_id,password,phone,name,hospital,birth,licenseFile)
+    return
 
 # 사용자 로그인
 @router.post("/login",summary="사용자 로그인")
@@ -36,4 +36,4 @@ def login(
 ):
     print(dto)
     res = service.login(dto)
-    return {"data": res}
+    return res

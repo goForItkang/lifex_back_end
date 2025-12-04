@@ -41,8 +41,8 @@ async def medicine(medicine:str,
     return res
 
 # 내병원에 있는 의약품 조회
-@router.get("/hospitals/{hospital}/medicines")
-async def hospitalsInDrug(hospital:str,medicine:str,
+@router.get("/hospitals/medicines")
+async def hospitalsInDrug(medicine:str,
                           authorization: str = Header(None),
     service : MedicineService = Depends(get_medicine_service
                                         )
@@ -51,6 +51,9 @@ async def hospitalsInDrug(hospital:str,medicine:str,
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED
         )
+    print("병원 이름"+decode_token(authorization)['hospital'])
+
+    hospital = decode_token(authorization)["hospital"]
     res = service.hospital_get_medicine(hospital,medicine)
     return res
 # 병원에서 약물에 대한 요청
@@ -60,20 +63,28 @@ def medicine_approval_request(
                             authorization: str = Header(None),
                             service:ApprovalService = Depends(get_medicine_approval_service)
                        ):
+    if authorization is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED
+        )
     request_hospital_id = decode_token(authorization)["hospital_id"]
     request_doctor_id = decode_token(authorization)["id"]
     service.request_approval_medicine(request_hospital_id,
                                       request_doctor_id,
                                       dto)
-    return "요청이 완료되었습니다."
+    return
 @router.get("/medicines-request")
 def medicine_reqeust_list(
-    hospital_id:int,
+    authorization: str = Header(None),
     service:ApprovalService = Depends(get_medicine_approval_service)
 ):
-    print(hospital_id)
+    if authorization is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED
+        )
+    hospital_id = decode_token(authorization)["hospital_id"]
     res = service.request_medicine(hospital_id)
-    print(res)
+
     return res
 
 

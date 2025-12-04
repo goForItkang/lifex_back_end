@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Header
 from google import genai
 from google.genai.errors import APIError
 from pydantic import BaseModel
@@ -11,6 +11,7 @@ from app.util.ai_util import get_ai_client
 from app.service.patient.patient_service import PatientService
 from typing import Optional
 from app.util.database_util import get_db
+from app.util.jwt_util import decode_token
 
 import ast
 import re
@@ -35,9 +36,10 @@ class AIRequest(BaseModel):
 async def ai_drug_recommendation(
         request: AIRequest,
         patient_service: PatientService = Depends(get_patient_service),
-        medical_service: MedicineService = Depends(get_medicine_service)
+        medical_service: MedicineService = Depends(get_medicine_service),
+
 ):
-    print(request)
+
     # 환자 정보가 있을 경우
     if request.patient_id is not None:
         patient = patient_service.get_patient_by_id(request.patient_id)
@@ -74,12 +76,10 @@ async def ai_drug_recommendation(
         # ```python ... ``` 제거
         cleaned = re.sub(r"```python|```", "", raw).strip()
 
-        # Python list 문자열 → 실제 list 변환
         try:
             recommended_list = ast.literal_eval(cleaned)
             print("결과에 대한응답",recommended_list)
             res = medical_service.get_medicines_list(recommended_list,request.hospital_name)
-            print("데이터 조회 결과",res)
             return res
         except Exception:
             recommended_list = []
