@@ -1,4 +1,6 @@
 # 약물에 대한 endPoint
+from traceback import print_tb
+
 from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends
 from sqlalchemy.orm import Session
@@ -83,8 +85,41 @@ def medicine_reqeust_list(
             status_code=status.HTTP_401_UNAUTHORIZED
         )
     hospital_id = decode_token(authorization)["hospital_id"]
+    print("병원 ID 값 결과",hospital_id)
     res = service.request_medicine(hospital_id)
 
     return res
 
+@router.get("/medicine/approval/pending")
+def medicine_pending(
+        authorization: str = Header(None),
+        service:ApprovalService = Depends(get_medicine_approval_service)
+):
+    if authorization is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED
+        )
+    role = decode_token(authorization)["role"]
+    if role != "ROLE_PHARMACIST":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN
+        )
+    hospital_id = decode_token(authorization)["hospital_id"]
+    res = service.approval_pending(hospital_id)
+    return res
+
+@router.patch("/medicine/approval/{id}")
+def medicine_approval(
+        id:int,
+        status:str,
+        authorization: str = Header(None),
+        service:ApprovalService = Depends(get_medicine_approval_service)
+):
+    if authorization is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED
+        )
+    user_id = decode_token(authorization)["id"]
+    service.approval_medicine(id,status,user_id)
+    return
 

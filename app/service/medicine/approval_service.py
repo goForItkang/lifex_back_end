@@ -17,5 +17,16 @@ class ApprovalService:
     def request_medicine(self, hospital_id):
         return self.dao.fin_by_hospital_id_get_request_history(hospital_id)
 
+    def approval_pending(self, hospital_id):
+        return self.dao.find_by_hospital_id_get_pedding_medicine(hospital_id)
+        pass
+    # 승인과 거절에 대한 응답서비스
+    def approval_medicine(self, id, status, user_id):
+        return self.dao.update_reqeust_history(id, status, user_id)
+        pass
+
+
+
+
 
 

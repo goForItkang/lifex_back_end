@@ -23,7 +23,7 @@ def create_access_token(dto):
         "name":dto["name"],
         "hospital":dto["hospital_name"],
         "hospital_id":dto["hospital_id"],
-        "role" :"doctor",
+        "role" :dto["role"],
         "exp": int((datetime.utcnow() + timedelta(minutes=jwt_expire)).timestamp())
     }
 

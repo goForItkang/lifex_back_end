@@ -6,8 +6,9 @@ class UserDAO:
         self.db = db
 
     def find_by_login_id_and_password(self,login_id,password):
-        sql = text("""select u.id,u.login_id,u.name,h.name as hospital_name,h.id as hospital_id 
-                      from user as u join hospital as h on h.id = u.hospital_id 
+        sql = text("""select u.id,u.login_id,u.name,h.name as hospital_name,h.id as hospital_id,role.name as role
+                      from user as u join hospital as h on h.id = u.hospital_id
+                      join role on role.id = u.role_id
                       where login_id=:login_id and password=:password""")
         row =  self.db.execute(sql,{"login_id":login_id,"password":password}).fetchone()
 

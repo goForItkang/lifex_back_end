@@ -71,3 +71,28 @@ class ApprovalDAO:
         rows = self.db.execute(sql,{"hospital_id":hospital_id}).fetchall()
         return [dict(row._mapping) for row in rows]
 
+    def find_by_hospital_id_get_pedding_medicine(self, hospital_id):
+        sql = text("""
+                   SELECT
+                       m.id as id,
+                       h.name AS hospital_name,
+                       i.inn_name AS inn_name,
+                       s.form AS form,
+                       s.dosage AS dosage,
+                       m.created_at AS created_at
+                   FROM medication_request_history m
+                            JOIN stock s ON m.stock_id = s.id
+                            JOIN inn i ON s.inn_id = i.id
+                            JOIN hospital h ON m.requester_hospital_id = h.id
+                   WHERE m.status = 'PENDING'
+                     AND m.response_hospital_id = :hospital_id;
+        """)
+        rows = self.db.execute(sql,{"hospital_id":hospital_id}).fetchall()
+        return [dict(row._mapping) for row in rows]
+        pass
+
+    def update_reqeust_history(self, id, status, user_id):
+        sql = text("""UPDATE medication_request_history SET status=:status, response_user_id=:user_id WHERE id=:id""")
+        self.db.execute(sql,{"id":id,"status":status,"user_id":user_id})
+        return self.db.commit()
+
