@@ -25,6 +25,10 @@ class ApprovalService:
         return self.dao.update_reqeust_history(id, status, user_id)
         pass
 
+    def request_medicine_by_inn(self, inn_name,hospital_id):
+        return self.dao.find_by_inn_name_reqeust_medicine(inn_name,hospital_id)
+        pass
+
 
 
 

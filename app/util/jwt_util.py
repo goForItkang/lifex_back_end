@@ -40,6 +40,3 @@ def decode_token(token: str):
     return jwt.decode(token, jwt_secret_key, algorithms=[jwt_algorithm])
 
 
-def vaildate_token(token:str):
-    return
-

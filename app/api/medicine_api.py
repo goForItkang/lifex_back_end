@@ -104,6 +104,7 @@ def medicine_pending(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN
         )
+
     hospital_id = decode_token(authorization)["hospital_id"]
     res = service.approval_pending(hospital_id)
     return res
@@ -119,7 +120,18 @@ def medicine_approval(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED
         )
+
     user_id = decode_token(authorization)["id"]
     service.approval_medicine(id,status,user_id)
     return
 
+@router.get("/medicines-request/search")
+def reqeust_medicine_by_inn(
+        inn_name:str,
+        authorization: str = Header(None),
+        service:ApprovalService = Depends(get_medicine_approval_service)
+):
+    hospital_id = decode_token(authorization)["hospital_id"]
+    print("병원값 ",hospital_id)
+    res = service.request_medicine_by_inn(inn_name,hospital_id)
+    return res

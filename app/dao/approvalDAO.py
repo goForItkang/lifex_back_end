@@ -1,4 +1,5 @@
 from sqlalchemy import text
+from sqlalchemy.engine import row
 
 
 class ApprovalDAO:
@@ -47,10 +48,8 @@ class ApprovalDAO:
                        r.status,
                        r.requester_hospital_id,
                        requester_h.name AS requester_hospital_name,
-
                        r.response_hospital_id,
                        responder_h.name AS response_hospital_name,
-
                        r.quantity,
                        i.inn_name,
                        r.updated_at
@@ -95,4 +94,38 @@ class ApprovalDAO:
         sql = text("""UPDATE medication_request_history SET status=:status, response_user_id=:user_id WHERE id=:id""")
         self.db.execute(sql,{"id":id,"status":status,"user_id":user_id})
         return self.db.commit()
+
+    def find_by_inn_name_reqeust_medicine(self, inn_name, hospital_id):
+        sql = text("""
+                   SELECT
+                       r.id,
+                       r.status,
+                       r.requester_hospital_id,
+                       requester_h.name AS requester_hospital_name,
+                       r.response_hospital_id,
+                       responder_h.name AS response_hospital_name,
+                       r.quantity,
+                       i.inn_name,
+                       i.korean_name,
+                       r.updated_at
+                   FROM medication_request_history AS r
+                            JOIN stock s
+                                 ON r.stock_id = s.id
+                            JOIN inn i
+                                 ON s.inn_id = i.id
+                            JOIN hospital requester_h
+                                 ON r.requester_hospital_id = requester_h.id
+                            JOIN hospital responder_h
+                                 ON r.response_hospital_id = responder_h.id
+                   WHERE (r.requester_hospital_id = :hospital_id
+                       OR r.response_hospital_id = :hospital_id)
+                     AND (i.inn_name LIKE :keyword
+                       OR i.korean_name LIKE :keyword)
+                   ORDER BY r.updated_at DESC
+                   """)
+
+        rows = self.db.execute(sql,{"keyword": f"{inn_name}%","hospital_id": hospital_id}
+        ).fetchall()
+
+        return [dict(row._mapping) for row in rows]
 
