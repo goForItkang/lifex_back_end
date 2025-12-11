@@ -1,5 +1,5 @@
 # 약물 요청에 대한 승인
-from app.dao.approvalDAO import ApprovalDAO
+from app.dao.approval_dao import ApprovalDAO
 from app.dao.hospital_dao import HospitalDAO
 from app.dto.medicine.medicine_reqeust_dto import MedicineRequestDto
 

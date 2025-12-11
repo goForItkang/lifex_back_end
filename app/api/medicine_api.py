@@ -12,6 +12,7 @@ from app.service.medicine.medicine_service import MedicineService
 from app.util.database_util import get_db
 from app.util.jwt_util import decode_token
 from fastapi import Header
+from app.dependency.service_provider import medicine_service_provider,medicine_approval_service_provider
 #
 router = APIRouter()
 
@@ -20,15 +21,11 @@ router = APIRouter()
 #         raise HTTPException(status_code=401, detail="Unauthorized")
 #     return authorization
 
-def get_medicine_service(db: Session = Depends(get_db)):
-    return MedicineService(db)
 
-def get_medicine_approval_service(db: Session = Depends(get_db)):
-    return ApprovalService(db)
 # 외부병원 의약품 조회
 @router.get("/medicines")
 async def medicine(medicine:str,
-    service: MedicineService = Depends(get_medicine_service),
+    service: MedicineService = Depends(medicine_service_provider),
                    authorization: str = Header(None)
     ):
     if authorization is None:
@@ -46,7 +43,7 @@ async def medicine(medicine:str,
 @router.get("/hospitals/medicines")
 async def hospitalsInDrug(medicine:str,
                           authorization: str = Header(None),
-    service : MedicineService = Depends(get_medicine_service
+    service : MedicineService = Depends(medicine_service_provider
                                         )
     ):
     if authorization is None:
@@ -63,7 +60,7 @@ async def hospitalsInDrug(medicine:str,
 def medicine_approval_request(
                             dto:MedicineRequestDto,
                             authorization: str = Header(None),
-                            service:ApprovalService = Depends(get_medicine_approval_service)
+                            service:ApprovalService = Depends(medicine_approval_service_provider)
                        ):
     if authorization is None:
         raise HTTPException(
@@ -78,7 +75,7 @@ def medicine_approval_request(
 @router.get("/medicines-request")
 def medicine_reqeust_list(
     authorization: str = Header(None),
-    service:ApprovalService = Depends(get_medicine_approval_service)
+    service:ApprovalService = Depends(medicine_approval_service_provider)
 ):
     if authorization is None:
         raise HTTPException(
@@ -93,7 +90,7 @@ def medicine_reqeust_list(
 @router.get("/medicine/approval/pending")
 def medicine_pending(
         authorization: str = Header(None),
-        service:ApprovalService = Depends(get_medicine_approval_service)
+        service:ApprovalService = Depends(medicine_approval_service_provider)
 ):
     if authorization is None:
         raise HTTPException(
@@ -114,7 +111,7 @@ def medicine_approval(
         id:int,
         status:str,
         authorization: str = Header(None),
-        service:ApprovalService = Depends(get_medicine_approval_service)
+        service:ApprovalService = Depends(medicine_approval_service_provider)
 ):
     if authorization is None:
         raise HTTPException(
@@ -129,9 +126,10 @@ def medicine_approval(
 def reqeust_medicine_by_inn(
         inn_name:str,
         authorization: str = Header(None),
-        service:ApprovalService = Depends(get_medicine_approval_service)
+        service:ApprovalService = Depends(medicine_approval_service_provider)
 ):
     hospital_id = decode_token(authorization)["hospital_id"]
+    print("성분이름",inn_name)
     print("병원값 ",hospital_id)
     res = service.request_medicine_by_inn(inn_name,hospital_id)
     return res

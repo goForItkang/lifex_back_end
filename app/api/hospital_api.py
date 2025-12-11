@@ -9,21 +9,15 @@ from app.util.database_util import get_db
 import logging
 from app.util.jwt_util import decode_token
 from starlette import status
-
+from app.dependency.service_provider import hospital_service_provider
 router=  APIRouter()
-
-def get_hospital_service(db: Session=Depends(get_db)):
-    return HospitalService(db)
-
-
 # 내 병원에 조회
 @router.get("/hospital/{hospital_name}")
 def get_hospital(hospital_name:str,
-                 service:HospitalService = Depends(get_hospital_service)
-                 ,authorization: str = Header(None)
+                 service:HospitalService = Depends(hospital_service_provider)
+                 ,authorization:str = Header(None)
                  ):
     if authorization is None:
-        print("error401")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED
         )
