@@ -10,23 +10,23 @@ class ApprovalService:
         self.hospital_dao = HospitalDAO(db)
     # 약물 요청 service
 
-    def request_approval_medicine(self, reqeust_hospital_id,request_doctor_id,dto:MedicineRequestDto):
+    def request_medicine_approval(self, reqeust_hospital_id,request_doctor_id,dto:MedicineRequestDto):
 
         self.dao.insert_medicine_reqeust_history(reqeust_hospital_id, request_doctor_id,dto.hospital_id,dto.stock_id,dto.quantity)
 
-    def request_medicine(self, hospital_id):
-        return self.dao.fin_by_hospital_id_get_request_history(hospital_id)
+    def get_medicine_reqeust_list(self, hospital_id):
+        return self.dao.find_request_history_by_hospital_id(hospital_id)
 
-    def approval_pending(self, hospital_id):
-        return self.dao.find_by_hospital_id_get_pedding_medicine(hospital_id)
+    def get_medicine_request_pending(self, hospital_id):
+        return self.dao.find_pending_requests(hospital_id)
         pass
     # 승인과 거절에 대한 응답서비스
-    def approval_medicine(self, id, status, user_id):
-        return self.dao.update_reqeust_history(id, status, user_id)
+    def status_update_medicine_request(self, id, status, user_id):
+        return self.dao.update_request_status(id, status, user_id)
         pass
 
-    def request_medicine_by_inn(self, inn_name,hospital_id):
-        return self.dao.find_by_inn_name_reqeust_medicine(inn_name,hospital_id)
+    def get_reqeust_medicine_by_inn(self, inn_name,hospital_id):
+        return self.dao.find_requests_by_inn_name(inn_name,hospital_id)
         pass
 
 

@@ -12,17 +12,11 @@ from app.service.patient.patient_service import PatientService
 from typing import Optional
 from app.util.database_util import get_db
 from app.util.jwt_util import decode_token
-
+from app.dependency.service_provider import patient_service_provider,medicine_service_provider
 import ast
 import re
 
 router = APIRouter(prefix="/ai", tags=["AI Recommendation"])
-
-def get_patient_service(db: Session = Depends(get_db)):
-    return PatientService(db)
-def get_medicine_service(db: Session = Depends(get_db)):
-    return MedicineService(db)
-
 
 class AIRequest(BaseModel):
     medicine: str
@@ -33,10 +27,10 @@ class AIRequest(BaseModel):
 
 
 @router.post("/recommendations")
-async def ai_drug_recommendation(
+async def ai_internal_inn_recommendation(
         request: AIRequest,
-        patient_service: PatientService = Depends(get_patient_service),
-        medical_service: MedicineService = Depends(get_medicine_service),
+        patient_service: PatientService = Depends(patient_service_provider),
+        medical_service: MedicineService = Depends(medicine_service_provider),
 
 ):
 
@@ -92,10 +86,10 @@ async def ai_drug_recommendation(
 
 # 외부 병원에 대한 ai 추천
 @router.post("/medicine/recommendations")
-async def ai_drug_recommendation(
+async def ai_external_inn_recommendation(
         request: AIRequest,
-        patient_service: PatientService = Depends(get_patient_service),
-        medical_service: MedicineService = Depends(get_medicine_service)
+        patient_service: PatientService = Depends(patient_service_provider),
+        medical_service: MedicineService = Depends(medicine_service_provider)
 ):
     # 환자 정보가 있을 경우
     if request.patient_id is not None:

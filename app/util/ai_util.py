@@ -15,7 +15,7 @@ try:
 
     # 💡 클라이언트 객체 생성
     AI_CLIENT = genai.Client()
-    print("Gemini AI Client initialized successfully.")
+    print("Gemini AI Client 초기화")
 
 except (ValueError, APIError) as e:
     print(f"Gemini 클라이언트 초기화 에러: {e}")

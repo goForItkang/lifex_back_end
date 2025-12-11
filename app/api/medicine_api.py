@@ -15,16 +15,9 @@ from fastapi import Header
 from app.dependency.service_provider import medicine_service_provider,medicine_approval_service_provider
 #
 router = APIRouter()
-
-# def verify_token(authorization: str = Header(None)):
-#     if authorization is None:
-#         raise HTTPException(status_code=401, detail="Unauthorized")
-#     return authorization
-
-
 # 외부병원 의약품 조회
 @router.get("/medicines")
-async def medicine(medicine:str,
+async def get_external_hospital_medicine(medicine:str,
     service: MedicineService = Depends(medicine_service_provider),
                    authorization: str = Header(None)
     ):
@@ -36,12 +29,12 @@ async def medicine(medicine:str,
     hospital_id = decode_token(authorization)["hospital_id"]
 
 
-    res = service.get_medicines(medicine,hospital_id)
+    res = service.get_external_hospital_medicine(medicine,hospital_id)
     return res
 
 # 내병원에 있는 의약품 조회
 @router.get("/hospitals/medicines")
-async def hospitalsInDrug(medicine:str,
+async def get_internal_hospital_medicine(medicine:str,
                           authorization: str = Header(None),
     service : MedicineService = Depends(medicine_service_provider
                                         )
@@ -53,11 +46,11 @@ async def hospitalsInDrug(medicine:str,
     print("병원 이름"+decode_token(authorization)['hospital'])
 
     hospital = decode_token(authorization)["hospital"]
-    res = service.hospital_get_medicine(hospital,medicine)
+    res = service.get_internal_hospital_medicine(hospital,medicine)
     return res
 # 병원에서 약물에 대한 요청
 @router.post("/medicines-request")
-def medicine_approval_request(
+def request_medicine_approval(
                             dto:MedicineRequestDto,
                             authorization: str = Header(None),
                             service:ApprovalService = Depends(medicine_approval_service_provider)
@@ -68,12 +61,12 @@ def medicine_approval_request(
         )
     request_hospital_id = decode_token(authorization)["hospital_id"]
     request_doctor_id = decode_token(authorization)["id"]
-    service.request_approval_medicine(request_hospital_id,
+    service.request_medicine_approval(request_hospital_id,
                                       request_doctor_id,
                                       dto)
     return
 @router.get("/medicines-request")
-def medicine_reqeust_list(
+def get_medicine_reqeust_list(
     authorization: str = Header(None),
     service:ApprovalService = Depends(medicine_approval_service_provider)
 ):
@@ -83,12 +76,12 @@ def medicine_reqeust_list(
         )
     hospital_id = decode_token(authorization)["hospital_id"]
     print("병원 ID 값 결과",hospital_id)
-    res = service.request_medicine(hospital_id)
+    res = service.get_medicine_reqeust_list(hospital_id)
 
     return res
 
 @router.get("/medicine/approval/pending")
-def medicine_pending(
+def get_medicine_request_pending(
         authorization: str = Header(None),
         service:ApprovalService = Depends(medicine_approval_service_provider)
 ):
@@ -103,11 +96,11 @@ def medicine_pending(
         )
 
     hospital_id = decode_token(authorization)["hospital_id"]
-    res = service.approval_pending(hospital_id)
+    res = service.get_medicine_request_pending(hospital_id)
     return res
 
 @router.patch("/medicine/approval/{id}")
-def medicine_approval(
+def status_update_medicine_request(
         id:int,
         status:str,
         authorization: str = Header(None),
@@ -119,11 +112,11 @@ def medicine_approval(
         )
 
     user_id = decode_token(authorization)["id"]
-    service.approval_medicine(id,status,user_id)
+    service.status_update_medicine_request(id,status,user_id)
     return
 
 @router.get("/medicines-request/search")
-def reqeust_medicine_by_inn(
+def get_reqeust_medicine_by_inn(
         inn_name:str,
         authorization: str = Header(None),
         service:ApprovalService = Depends(medicine_approval_service_provider)
@@ -131,5 +124,5 @@ def reqeust_medicine_by_inn(
     hospital_id = decode_token(authorization)["hospital_id"]
     print("성분이름",inn_name)
     print("병원값 ",hospital_id)
-    res = service.request_medicine_by_inn(inn_name,hospital_id)
+    res = service.get_reqeust_medicine_by_inn(inn_name,hospital_id)
     return res

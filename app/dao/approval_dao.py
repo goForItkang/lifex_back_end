@@ -41,7 +41,7 @@ class ApprovalDAO:
         self.db.commit()
         return {"result": "SUCCESS"}
 
-    def fin_by_hospital_id_get_request_history(self, hospital_id):
+    def find_request_history_by_hospital_id(self, hospital_id):
         sql = text("""
                    SELECT
                        r.id,
@@ -70,7 +70,7 @@ class ApprovalDAO:
         rows = self.db.execute(sql,{"hospital_id":hospital_id}).fetchall()
         return [dict(row._mapping) for row in rows]
 
-    def find_by_hospital_id_get_pedding_medicine(self, hospital_id):
+    def find_pending_requests(self, hospital_id):
         sql = text("""
                    SELECT
                        m.id as id,
@@ -90,12 +90,12 @@ class ApprovalDAO:
         return [dict(row._mapping) for row in rows]
         pass
 
-    def update_reqeust_history(self, id, status, user_id):
+    def update_request_status(self, id, status, user_id):
         sql = text("""UPDATE medication_request_history SET status=:status, response_user_id=:user_id WHERE id=:id""")
         self.db.execute(sql,{"id":id,"status":status,"user_id":user_id})
         return self.db.commit()
 
-    def find_by_inn_name_reqeust_medicine(self, inn_name, hospital_id):
+    def find_requests_by_inn_name(self, inn_name, hospital_id):
         sql = text("""
                    SELECT
                        r.id,
