@@ -1,13 +1,9 @@
 from fastapi import APIRouter
 from fastapi.params import Depends
-from sqlalchemy.orm import Session
-
 from app.dto.user.user_login_dto import LoginDTO
-from app.dto.user.user_signup_dto import SignupDTO
 from fastapi import Form, File, UploadFile
 from datetime import date
 from app.service.user.user_service import UserService
-from app.util.database_util import get_db
 from app.dependency.service_provider import user_service_provider
 router = APIRouter()
 
@@ -28,7 +24,7 @@ def signup(
     return
 
 # 사용자 로그인
-@router.post("/login",summary="사용자 로그인")
+@router.post("/login",summary="사용자 로그인",response_model=str,response_description="JWT_ACCESS_TOKEN")
 def login(
         dto:LoginDTO,
         service:UserService=Depends(user_service_provider)

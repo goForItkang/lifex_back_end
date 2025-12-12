@@ -4,6 +4,9 @@ from sqlalchemy.orm import Session
 
 from app.service.amdin.admin_service import AdminService
 from app.service.medicine.approval_service import ApprovalService
+from app.service.medicine.medicine_service import MedicineService
+from app.service.patient.patient_service import PatientService
+from app.service.user.user_service import UserService
 from app.util.database_util import get_db
 from app.service.hospital.hospital_service import HospitalService
 
@@ -42,7 +45,7 @@ def medicine_approval_service_provider(db: Session = Depends(get_db)):
         db.close()
 # 약물 ServiceProvider
 def medicine_service_provider(db: Session = Depends(get_db)):
-    service = ApprovalService(db)
+    service = MedicineService(db)
     try:
         yield service
         db.commit()
@@ -53,7 +56,7 @@ def medicine_service_provider(db: Session = Depends(get_db)):
         db.close()
 # user ServiceProvider
 def user_service_provider(db: Session = Depends(get_db)):
-    service = ApprovalService(db)
+    service = UserService(db)
     try:
         yield service
         db.commit()
@@ -64,7 +67,7 @@ def user_service_provider(db: Session = Depends(get_db)):
         db.close()
 # 환자 service provider
 def patient_service_provider(db: Session = Depends(get_db)):
-    service = ApprovalService(db)
+    service = PatientService(db)
     try:
         yield service
         db.commit()

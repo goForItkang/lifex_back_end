@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from app.dto.medicine.medicine_reqeust_dto import MedicineRequestDto
+from app.dto.medicine.medicine_response_dto import MedicineResponseDto
 from app.service.medicine.approval_service import ApprovalService
 from app.service.medicine.medicine_service import MedicineService
 from app.util.database_util import get_db
@@ -16,7 +17,7 @@ from app.dependency.service_provider import medicine_service_provider,medicine_a
 #
 router = APIRouter()
 # 외부병원 의약품 조회
-@router.get("/medicines")
+@router.get("/medicines",summary="외부병원에서 성분 검색",response_model=list[MedicineResponseDto])
 async def get_external_hospital_medicine(medicine:str,
     service: MedicineService = Depends(medicine_service_provider),
                    authorization: str = Header(None)
@@ -30,6 +31,7 @@ async def get_external_hospital_medicine(medicine:str,
 
 
     res = service.get_external_hospital_medicine(medicine,hospital_id)
+    print("외부병원 조회돈값 :",res)
     return res
 
 # 내병원에 있는 의약품 조회
