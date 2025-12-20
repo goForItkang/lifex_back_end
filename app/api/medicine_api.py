@@ -35,7 +35,7 @@ async def get_external_hospital_medicine(medicine:str,
     return res
 
 # 내병원에 있는 의약품 조회
-@router.get("/hospitals/medicines")
+@router.get("/hospitals/medicines",summary="내 병원에서 성분 검색",response_model=list[MedicineResponseDto])
 async def get_internal_hospital_medicine(medicine:str,
                           authorization: str = Header(None),
     service : MedicineService = Depends(medicine_service_provider
@@ -51,7 +51,7 @@ async def get_internal_hospital_medicine(medicine:str,
     res = service.get_internal_hospital_medicine(hospital,medicine)
     return res
 # 병원에서 약물에 대한 요청
-@router.post("/medicines-request")
+@router.post("/medicines-request",summary="외부병원에게 약물 요청")
 def request_medicine_approval(
                             dto:MedicineRequestDto,
                             authorization: str = Header(None),
@@ -67,7 +67,7 @@ def request_medicine_approval(
                                       request_doctor_id,
                                       dto)
     return
-@router.get("/medicines-request")
+@router.get("/medicines-request",summary="요청된 리스트 출력")
 def get_medicine_reqeust_list(
     authorization: str = Header(None),
     service:ApprovalService = Depends(medicine_approval_service_provider)
@@ -82,7 +82,7 @@ def get_medicine_reqeust_list(
 
     return res
 
-@router.get("/medicine/approval/pending")
+@router.get("/medicine/approval/pending",summary="승인 대기 중인 약물요청 리스트")
 def get_medicine_request_pending(
         authorization: str = Header(None),
         service:ApprovalService = Depends(medicine_approval_service_provider)
@@ -101,7 +101,7 @@ def get_medicine_request_pending(
     res = service.get_medicine_request_pending(hospital_id)
     return res
 
-@router.patch("/medicine/approval/{id}")
+@router.patch("/medicine/approval/{id}",summary="약물 승인/거절 응답")
 def status_update_medicine_request(
         id:int,
         status:str,
@@ -117,14 +117,12 @@ def status_update_medicine_request(
     service.status_update_medicine_request(id,status,user_id)
     return
 
-@router.get("/medicines-request/search")
+@router.get("/medicines-request/search",summary="요청된 내역 검색")
 def get_reqeust_medicine_by_inn(
         inn_name:str,
         authorization: str = Header(None),
         service:ApprovalService = Depends(medicine_approval_service_provider)
 ):
     hospital_id = decode_token(authorization)["hospital_id"]
-    print("성분이름",inn_name)
-    print("병원값 ",hospital_id)
     res = service.get_reqeust_medicine_by_inn(inn_name,hospital_id)
     return res

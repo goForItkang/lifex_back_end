@@ -10,6 +10,7 @@ from app.api.patient_api import router as patient_router
 from app.api.user_api import router as user_router
 from app.api.hospital_api import router as hospital_router
 from app.api.admin_api import router as admin_router
+from app.api.file_api import router as file_router
 import os
 app = FastAPI()
 
@@ -34,6 +35,7 @@ app.include_router(patient_router,prefix="/api")
 app.include_router(user_router,prefix="/api")
 app.include_router(hospital_router,prefix="/api")
 app.include_router(admin_router,prefix="/api")
+app.include_router(file_router,prefix="/api")
 if __name__ == "__main__":
 
     port = int(os.getenv("PORT", 8000))

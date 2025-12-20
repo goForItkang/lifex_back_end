@@ -26,7 +26,7 @@ class AIRequest(BaseModel):
 
 
 
-@router.post("/recommendations")
+@router.post("/recommendations",)
 async def ai_internal_inn_recommendation(
         request: AIRequest,
         patient_service: PatientService = Depends(patient_service_provider),
@@ -77,7 +77,7 @@ async def ai_internal_inn_recommendation(
             return res
         except Exception:
             recommended_list = []
-            print("⚠️ AI 응답 파싱 실패:", cleaned)
+            print(" AI 응답 파싱 실패:", cleaned)
             return  Exception
     except Exception as e:
         print("SERVER ERROR:", e)
@@ -136,7 +136,7 @@ async def ai_external_inn_recommendation(
             return res
         except Exception:
             recommended_list = []
-            print("⚠️ AI 응답 파싱 실패:", cleaned)
+            print(" AI 응답 파싱 실패:", cleaned)
             return  Exception
 
 

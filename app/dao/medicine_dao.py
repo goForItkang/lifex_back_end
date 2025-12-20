@@ -91,9 +91,10 @@ class MedicineDAO:
         for idx, name in enumerate(recommended_list):
             params[f"p{idx}"] = f"%{name}%"
 
-        rows = self.db.execute(sql, params).fetchall()
+        result = self.db.execute(sql, params)
+        rows = result.mappings().all()
 
-        return [dict(row._mapping) for row in rows]
+        return rows
 
     def hospital_not_get_ai_recommend_inn(self, recommended_list, hospital):
 
@@ -129,5 +130,5 @@ class MedicineDAO:
 
         rows = self.db.execute(sql, params).fetchall()
 
-        return [dict(row._mapping) for row in rows]
+        return rows
 

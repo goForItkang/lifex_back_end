@@ -48,3 +48,4 @@ def admin_medicine_approval_detail(
     res = service.find_by_id_request_medicine(id)
     print(res)
     return res
+
